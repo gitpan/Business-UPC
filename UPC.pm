@@ -12,7 +12,7 @@ require Exporter;
 # Do not simply export all your public functions/methods/constants.
 @EXPORT = qw(
 );
-$VERSION = '0.02';
+$VERSION = '0.04';
 
 # Preloaded methods go here.
 
@@ -21,12 +21,16 @@ sub new
    my $class = shift;
    my $value = shift;
 
+   return undef if length($value) > 12;
+
    my ($number_system, $mfr_id, $prod_id, $check_digit) = unpack("AA5A5A", _zeropad $value);
 
-#   return undef unless $number_system =~ m/^\d$/;
-#   return undef unless $mfr_id =~ m/^\d{5}$/;
-#   return undef unless $prod_id =~ m/^\d{5}$/;
-#   return undef unless $check_digit =~ m/^[\dx]$/i;
+   return undef unless $number_system =~ m/^\d$/;
+   return undef unless $mfr_id =~ m/^\d{5}$/;
+   return undef unless $prod_id =~ m/^\d{5}$/;
+   return undef unless $check_digit =~ m/^[\dx]$/i;
+
+   return undef if ($number_system == 0 && $mfr_id == 0 && $prod_id == 0);
 
    my $upc = bless {
 	number_system => $number_system,
@@ -44,9 +48,12 @@ sub type_e
    my $class = shift;
    my $value = shift;
 
+   return undef if length($value) > 8;
+
    my $expanded = _expand_upc_e $value;
 
    return new Business::UPC($expanded) if $expanded;
+   return undef;
 }
 
 sub number_system
@@ -150,6 +157,7 @@ sub fix_check_digit
 {
    my $self = shift;
    $self->{check_digit} = _check_digit($self->as_upca_nocheckdigit);
+   $self;
 }
 
 sub as_upc_e
@@ -173,12 +181,15 @@ sub _check_digit
 
    my @digits = split(//, $num);
 
+   # To avoid warning when summing below.
+   push @digits, 0;
+
    my $sum = 0;
 
    foreach my $i (0, 2, 4, 6, 8, 10)
    {
-      $sum += 3 * $digits[$i];
-      $sum += $digits[$i+1];
+      $sum += 3 * ($digits[$i] || 0);
+      $sum += $digits[$i+1] || 0;
    }
 
    return (10 - ($sum % 10)) % 10;
