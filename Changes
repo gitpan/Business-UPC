@@ -1,0 +1,10 @@
+Revision history for Perl extension Business::UPC.
+
+0.02  Wed Nov  4 14:16:00 1998
+	- complete enough to release on my web site now...
+	- more detailed documentation required, but
+		synopses are there...
+
+0.01  Wed Nov  4 11:01:38 1998
+	- original version; created by h2xs 1.18
+
