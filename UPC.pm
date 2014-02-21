@@ -12,7 +12,7 @@ require Exporter;
 # Do not simply export all your public functions/methods/constants.
 @EXPORT = qw(
 );
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 # Preloaded methods go here.
 
@@ -93,6 +93,12 @@ sub as_upc_a
    my $self = shift;
    return $self->number_system . $self->mfr_id
 	. $self->prod_id . $self->check_digit;
+}
+
+sub as_upc_a_nocheck
+{
+   my $self = shift;
+   return $self->number_system . $self->mfr_id . $self->prod_id;
 }
 
 sub as_upc
@@ -408,7 +414,7 @@ More detail to come later...
 
 =head1 AUTHOR
 
-Rob Fugina, robf@geeks.com
+Rob Fugina, robf@fugina.com
 
 =head1 SEE ALSO
 
